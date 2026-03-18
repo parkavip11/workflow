@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Automation System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <h2>AutomateFlow</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="workflows-list">
+                    <i class="fas fa-list"></i> Workflows
+                </a>
+                <a href="#" class="nav-item" data-tab="create-workflow">
+                    <i class="fas fa-plus-circle"></i> Create Workflow
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-titles">
+                    <h1>Dashboard</h1>
+                    <p class="subtitle">Manage and automate your tasks</p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Workflows List View -->
+                <section id="workflows-list" class="tab-content active">
+                    <div class="section-header">
+                        <h2>Your Workflows</h2>
+                        <button class="btn btn-primary" onclick="document.querySelector('[data-tab=\'create-workflow\']').click()">
+                            <i class="fas fa-plus"></i> New Workflow
+                        </button>
+                    </div>
+                    
+                    <div id="workflows-grid" class="workflows-grid">
+                        <!-- Workflow cards will be inserted here dynamically -->
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i> Loading workflows...
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Create Workflow View -->
+                <section id="create-workflow" class="tab-content">
+                    <div class="section-header">
+                        <h2>Create New Workflow</h2>
+                    </div>
+                    
+                    <div class="card form-card">
+                        <form id="workflow-form">
+                            <div class="form-group">
+                                <label for="wf-name">Workflow Name</label>
+                                <input type="text" id="wf-name" placeholder="e.g. Daily Data Backup" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="wf-desc">Description</label>
+                                <textarea id="wf-desc" rows="3" placeholder="Describe what this workflow does..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="wf-trigger">Trigger Type</label>
+                                <select id="wf-trigger" required>
+                                    <option value="" disabled selected>Select a trigger</option>
+                                    <option value="schedule">Schedule (Time-based)</option>
+                                    <option value="webhook">Webhook Event</option>
+                                    <option value="user_signup">User Signup</option>
+                                    <option value="manual">Manual Trigger</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="document.querySelector('[data-tab=\'workflows-list\']').click()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Workflow</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Workflow Details / Tasks View (Hidden initially) -->
+                <section id="workflow-details" class="tab-content">
+                    <button class="btn btn-back" onclick="document.querySelector('[data-tab=\'workflows-list\']').click()">
+                        <i class="fas fa-arrow-left"></i> Back to Workflows
+                    </button>
+                    
+                    <div class="details-header">
+                        <h2 id="detail-wf-name">Workflow Details</h2>
+                        <span id="detail-wf-trigger" class="badge"></span>
+                        <p id="detail-wf-desc" class="subtitle"></p>
+                    </div>
+
+                    <div class="action-bar">
+                        <button id="btn-execute-wf" class="btn btn-success">
+                            <i class="fas fa-play"></i> Run Workflow Now
+                        </button>
+                        <button id="btn-delete-wf" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+
+                    <div class="tasks-section">
+                        <h3>Tasks Sequence</h3>
+                        <p class="subtitle">These tasks will execute in order</p>
+                        
+                        <div id="tasks-list" class="tasks-list">
+                            <!-- Tasks will be inserted here -->
+                        </div>
+
+                        <div class="card add-task-card">
+                            <h4>Add New Task</h4>
+                            <form id="task-form" class="inline-form">
+                                <select id="task-type" required>
+                                    <option value="" disabled selected>Task Type</option>
+                                    <option value="send_email">Send Email</option>
+                                    <option value="run_script">Run Script</option>
+                                    <option value="http_request">HTTP Request</option>
+                                    <option value="database_query">Database Query</option>
+                                </select>
+                                <input type="text" id="task-config" placeholder="Config (JSON string)" value="{}" required>
+                                <input type="number" id="task-order" placeholder="Order" min="1" required>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div id="execution-results" class="execution-results hidden">
+                        <h4>Execution Results</h4>
+                        <pre id="execution-log"></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fas fa-info-circle"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
